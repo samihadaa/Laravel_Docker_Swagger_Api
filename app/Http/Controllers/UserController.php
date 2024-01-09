@@ -6,6 +6,7 @@ use App\Http\Requests\updateInfoRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserCreateRequest;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -17,10 +18,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('role')->paginate(15);
-        return response()->json([
-            'users' => $users
-        ]);
+        $users = UserResource::collection(User::paginate(15));
+        return $users;
     }
 
     /**
@@ -31,9 +30,9 @@ class UserController extends Controller
      */
     public function store(UserCreateRequest $request)
     {
-        $user = User::create($request->only('email', 'first_name', 'last_name')+['password' => Hash::make(123456)]);
+        $user = User::create($request->only('email', 'first_name', 'last_name', 'role_id')+['password' => Hash::make(123456)]);
         return response()->json([
-            'user' => $user,
+            'user' => new UserResource($user) ,
             'status' => 203,
         ]);
     }
@@ -46,10 +45,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::with('role')->find($id);
-        return response()->json([
-            'user' => $user,
-        ]);
+        $user = new UserResource(User::find($id));
+        return $user;
     }
 
     /**
@@ -64,7 +61,7 @@ class UserController extends Controller
         $user = User::find($id);
         $user->update($request->all());
         return response()->json([
-            'user' => $user,
+            'user' => new UserResource($user),
         ]);
     }
 

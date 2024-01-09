@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
@@ -16,9 +17,10 @@ class AuthController extends Controller
             'last_name' => $request->input('last_name'),
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
+            'role_id' => 1,
         ]);
         return response()->json([
-            'user' => $user,
+            'user' => new UserResource($user),
             'status' =>203,
         ]);
     }
@@ -35,7 +37,7 @@ class AuthController extends Controller
         $token = $user->createToken('myToken')->plainTextToken;
         return response()->json([
             'token' => $token,
-            'user' => $user,
+            'user' => new UserResource($user),
         ]);
     }
     public function user(Request $request){
