@@ -15,7 +15,7 @@ class RoleController extends Controller
         ]);
     }
     public function show($id){
-        $role = Role::find($id);
+        $role = Role::with('permissions')->find($id);
         return response()->json([
             'role' => $role,
             'status' => 200,
