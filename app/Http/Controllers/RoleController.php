@@ -21,10 +21,11 @@ class RoleController extends Controller
             'status' => 200,
         ]);
     }
-    public function create(Request $request){
+    public function store(Request $request){
         $role = Role::create([
-            'name' => $request->input('name'),
+            'name' => $request->only('name'),
         ]);
+        $role->permissions()->attach($request->input('permissions'));
         return response()->json([
             'role' => $role,
             'status' => 201,
@@ -33,8 +34,9 @@ class RoleController extends Controller
     public function update(Request $request, $id){
         $role = Role::find($id);
         $role->update($request->only('name'));
+        $role->permissions()->sync($request->input('permissions'));
         return response()->json([
-            'role' => $role,
+            'role' => Role::with('permissions')->find($id),
             'status' => 200,
         ]);
     }
